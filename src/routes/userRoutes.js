@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
   try {
     const user = req.body;
     // query to find all users in the collection
-    const query = { email: user.email };
+    const query = { email: user?.email };
     // check if there already exist an user
     const isExist = await User.findOne(query);
     if (isExist) {
