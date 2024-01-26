@@ -15,6 +15,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://appointify-d45b1.web.app",
+      "https://appointify.surge.sh",
     ],
     credentials: true,
   })
