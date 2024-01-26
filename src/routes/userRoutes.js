@@ -3,12 +3,33 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const verifyToken = require("../middlewares/verifyToken");
+const verifyAdmin = require("../middlewares/verifyAdmin");
 
 // get all users
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const result = await User.find();
     res.send(result);
+  } catch (error) {
+    console.error(error);
+    return res.send({ error: true, message: error.message });
+  }
+});
+
+// check user for admin access
+router.get("/admin/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    if (user.role === "admin") {
+      res.send(true);
+    }
   } catch (error) {
     console.error(error);
     return res.send({ error: true, message: error.message });
@@ -20,7 +41,7 @@ router.post("/", async (req, res) => {
   try {
     const user = req.body;
     // query to find all users in the collection
-    const query = { email: user.email };
+    const query = { email: user?.email };
     // check if there already exist an user
     const isExist = await User.findOne(query);
     if (isExist) {

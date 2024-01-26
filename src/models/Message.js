@@ -1,23 +1,22 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const userSchema = new Schema({
+const messageSchema = new Schema({
   // Define user schema here
   _id: {
     type: Schema.Types.ObjectId,
     default: () => new mongoose.Types.ObjectId(),
   },
   name: String,
-  photo: String,
+  phone: String,
   email: String,
-  status: String,
-  role: String,
-  createdAt: {
+  message: String,
+  timestamp: {
     type: Date,
     default: Date.now,
   },
 });
 
-const User = model("User", userSchema);
+const Message = model("Message", messageSchema);
 
-module.exports = User;
+module.exports = Message;
