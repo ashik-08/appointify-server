@@ -7,6 +7,7 @@ const userSchema = new Schema({
   photo: String,
   email: String,
   status: String,
+  role: String,
   createdAt: {
     type: Date,
     default: Date.now,
