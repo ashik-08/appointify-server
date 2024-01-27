@@ -35,6 +35,21 @@ router.get("/admin/:email", async (req, res) => {
     return res.send({ error: true, message: error.message });
   }
 });
+// check user role
+router.get("/:email",verifyToken, async (req, res) => {
+  try {
+    const email = req.params.email;
+
+    const user = await User.findOne({ email });
+
+    const result = user.role
+      res.send(result);
+    
+  } catch (error) {
+    console.error(error);
+    return res.send({ error: true, message: error.message });
+  }
+});
 
 // add a user to collection
 router.post("/", async (req, res) => {
