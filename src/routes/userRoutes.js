@@ -35,14 +35,13 @@ router.get("/admin/:email", async (req, res) => {
     return res.send({ error: true, message: error.message });
   }
 });
-// check user role
+// Get userData
 router.get("/:email",verifyToken, async (req, res) => {
   try {
     const email = req.params.email;
 
-    const user = await User.findOne({ email });
+    const result = await User.findOne({ email });
 
-    const result = user.role
       res.send(result);
     
   } catch (error) {
