@@ -11,6 +11,10 @@ const messageSchema = new Schema({
   phone: String,
   email: String,
   message: String,
+  status: {
+    type: String,
+    default: "pending",
+  },
   timestamp: {
     type: Date,
     default: Date.now,
