@@ -1,4 +1,3 @@
-// routes/userRoutes.js
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
@@ -35,15 +34,13 @@ router.get("/admin/:email", async (req, res) => {
     return res.send({ error: true, message: error.message });
   }
 });
-// Get userData
-router.get("/:email",verifyToken, async (req, res) => {
+
+// get userData
+router.get("/:email", verifyToken, async (req, res) => {
   try {
     const email = req.params.email;
-
     const result = await User.findOne({ email });
-
-      res.send(result);
-    
+    res.send(result);
   } catch (error) {
     console.error(error);
     return res.send({ error: true, message: error.message });

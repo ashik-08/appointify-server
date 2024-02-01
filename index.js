@@ -49,7 +49,7 @@ app.use("/users", userRoutes);
 // message related routes
 app.use("/messages", messageRoutes);
 
-// Ratings related routes
+// ratings related routes
 app.use("/ratings", ratingsRoutes);
 
 app.get("/", (req, res) => {

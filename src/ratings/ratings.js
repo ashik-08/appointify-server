@@ -1,9 +1,8 @@
-// ratings.js
 const express = require("express");
 const { MongoClient } = require("mongodb");
 const router = express.Router();
 
-const uri = process.env.DB_URI; 
+const uri = process.env.DB_URI;
 const client = new MongoClient(uri);
 
 // Connect to MongoDB
@@ -34,8 +33,8 @@ router.post("/", async (req, res) => {
 // Get ratings
 router.get("/", async (req, res) => {
   try {
-    const database = client.db("appointify"); 
-    const ratingsCollection = database.collection("ratings"); 
+    const database = client.db("appointify");
+    const ratingsCollection = database.collection("ratings");
 
     const result = await ratingsCollection.find().toArray();
     res.send(result);
