@@ -6,6 +6,7 @@ const connectDB = require("./src/db/connectDB");
 require("dotenv").config();
 const userRoutes = require("./src/routes/userRoutes");
 const messageRoutes = require("./src/routes/messageRoutes");
+const ratingsRoutes = require("./src/ratings/ratings");
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -14,8 +15,9 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://appointify-d45b1.web.app/",
-      "https://appointify.surge.sh/",
+      "https://appointify-d45b1.web.app",
+      "https://appointify-d45b1.firebaseapp.com",
+      "https://appointify.surge.sh",
     ],
     credentials: true,
   })
@@ -46,6 +48,9 @@ app.use("/users", userRoutes);
 
 // message related routes
 app.use("/messages", messageRoutes);
+
+// ratings related routes
+app.use("/ratings", ratingsRoutes);
 
 app.get("/", (req, res) => {
   res.send("Appointify server is running!");

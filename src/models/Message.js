@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const messageSchema = new Schema({
-  // Define user schema here
+  // Define message schema here
   _id: {
     type: Schema.Types.ObjectId,
     default: () => new mongoose.Types.ObjectId(),
@@ -11,6 +11,10 @@ const messageSchema = new Schema({
   phone: String,
   email: String,
   message: String,
+  status: {
+    type: String,
+    default: "pending",
+  },
   timestamp: {
     type: Date,
     default: Date.now,
