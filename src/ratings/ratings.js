@@ -5,16 +5,6 @@ const router = express.Router();
 const uri = process.env.DB_URI;
 const client = new MongoClient(uri);
 
-// Connect to MongoDB
-async function connectMongoDB() {
-  try {
-    await client.connect();
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-  }
-}
-
 // Create ratings
 router.post("/", async (req, res) => {
   try {
