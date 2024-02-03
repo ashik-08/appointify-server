@@ -6,7 +6,7 @@ const connectDB = require("./src/db/connectDB");
 require("dotenv").config();
 const userRoutes = require("./src/routes/userRoutes");
 const messageRoutes = require("./src/routes/messageRoutes");
-const ratingsRoutes = require("./src/ratings/ratings");
+const ratingRoutes = require("./src/routes/ratingRoutes");
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -50,7 +50,7 @@ app.use("/users", userRoutes);
 app.use("/messages", messageRoutes);
 
 // ratings related routes
-app.use("/ratings", ratingsRoutes);
+app.use("/ratings", ratingRoutes);
 
 app.get("/", (req, res) => {
   res.send("Appointify server is running!");
