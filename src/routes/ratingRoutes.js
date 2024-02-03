@@ -59,8 +59,8 @@ router.get("/:email", async (req, res) => {
 
         if (!data) {
             // If no rating is found for the specified email
-            res.status(404).json({
-                message: "No rating found for the given email"
+            res.status(200).json({
+                notFound: "true"
             });
         } else {
             // If a rating is found
