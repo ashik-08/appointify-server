@@ -6,10 +6,10 @@ const jwt = require("jsonwebtoken");
 const connectDB = require("./src/db/connectDB");
 const userRoutes = require("./src/routes/userRoutes");
 const messageRoutes = require("./src/routes/messageRoutes");
-const ratingsRoutes = require("./src/ratings/ratings");
 const blogs = require("./src/routes/blogs");
 const comments = require("./src/routes/comments");
 const likes = require("./src/routes/likes");
+const ratingRoutes = require("./src/routes/ratingRoutes");
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -53,7 +53,7 @@ app.use("/users", userRoutes);
 app.use("/messages", messageRoutes);
 
 // ratings related routes
-app.use("/ratings", ratingsRoutes);
+app.use("/ratings", ratingRoutes);
 
 // blog related routes
 app.use("/blogs", blogs);
