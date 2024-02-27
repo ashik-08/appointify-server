@@ -90,37 +90,6 @@ router.post("/:userId", async (req, res) => {
   }
 });
 
-// POST route to add or update participants for a specific event
-
-router.post("/:userId/:eventId/participants", async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const eventId = req.params.eventId;
-    const newParticipants = req.body;
-
-    // Find the user by ID
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // Find the event by ID and associated user
-    const event = await Event.findOne({ _id: eventId, user: userId });
-    if (!event) {
-      return res.status(404).json({ error: "Event not found" });
-    }
-
-    // Add new participants to the participants array
-    event.participants.push(newParticipants);
-    await event.save();
-
-    res.json({ success: true, message: "Participant added successfully" });
-  } catch (err) {
-    console.error("Error adding participants:", err);
-    res.status(500).json({ error: "Error adding participants" });
-  }
-});
-
 // PUT route to update one or more fields of a specific event
 router.put("/:userId/:eventId", async (req, res) => {
   try {
@@ -150,15 +119,16 @@ router.put("/:userId/:eventId", async (req, res) => {
   }
 });
 
-//PUT route to update specific event participant
-router.put(
-  "/:userId/:eventId/:participantId/updateParticipants",
+
+
+// DELETE route to delete a specific participant from the participants array for a specific event
+router.delete(
+  "/:userId/:eventId/:participantId/removeParticipants",
   async (req, res) => {
     try {
       const userId = req.params.userId;
       const eventId = req.params.eventId;
       const participantId = req.params.participantId;
-      const updatedParticipantData = req.body;
 
       // Find the user by ID
       const user = await User.findById(userId);
@@ -172,28 +142,82 @@ router.put(
         return res.status(404).json({ error: "Event not found" });
       }
 
-      // Find the index of the participant to update in the participants array
+      // Find the index of the participant in the participants array
       const participantIndex = event.participants.findIndex(
-        (participant) => participant._id == participantId
+        (participant) => participant._id === participantId
       );
       if (participantIndex === -1) {
-        return res
-          .status(404)
-          .json({ error: "Participant not found in the event" });
+        return res.status(404).json({ error: "Participant not found" });
       }
 
-      // Update the participant with the new data
-      event.participants[participantIndex] = {
-        ...event.participants[participantIndex],
-        ...updatedParticipantData,
-      };
+      // Remove the participant at the specified index
+      event.participants.splice(participantIndex, 1);
       await event.save();
 
       res.json(event);
     } catch (err) {
-      console.error("Error updating participant:", err);
-      res.status(500).json({ error: "Error updating participant" });
+      console.error("Error deleting participant:", err);
+      res.status(500).json({ error: "Error deleting participant" });
     }
   }
 );
+
+// <=======================>participants <===============================>
+// POST route to add or update participants for a specific event
+
+router.post("/addParticipants/:eventId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const eventId = req.params.eventId;
+    const newParticipants = req.body;
+
+    // Find the event by ID and associated user
+    const event = await Event.findOne({ _id: eventId });
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    // Add new participants to the participants array
+    event.participants.push(newParticipants);
+    await event.save();
+
+    res.json({ success: true, message: "Participant added successfully" });
+  } catch (err) {
+    console.error("Error adding participants:", err);
+    res.status(500).json({ error: "Error adding participants" });
+  }
+});
+
+// PUT route to update a specific participant in the participants array for a specific event
+router.put('/:eventId/participants/:participantId', async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+    const participantId = req.params.participantId;
+    const updatedParticipantData = req.body;
+
+    // Find the event by ID
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    // Find the participant by ID in the participants array
+    const participant = event.participants.find(participant => participant._id == participantId);
+    if (!participant) {
+      return res.status(404).json({ error: "Participant not found" });
+    }
+
+    // Update the participant's information
+    Object.assign(participant, updatedParticipantData);
+
+    // Save the updated event
+    await event.save();
+
+    res.json(event);
+  } catch (err) {
+    console.error("Error updating participant:", err);
+    res.status(500).json({ error: "Error updating participant" });
+  }
+});
+
 module.exports = router;
