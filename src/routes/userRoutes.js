@@ -5,7 +5,7 @@ const verifyToken = require("../middlewares/verifyToken");
 const verifyAdmin = require("../middlewares/verifyAdmin");
 
 // get all users
-router.get("/", verifyToken, verifyAdmin, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const result = await User.find();
     res.send(result);

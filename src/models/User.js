@@ -16,6 +16,49 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  availability: [
+    {
+      day: {
+        type: String,
+        required: true,
+        enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], // Add other days as needed
+      },
+      slots: [
+        {
+          start_time: {
+            type: String,
+            required: true,
+            validate: {
+              validator: (value) => {
+                const timeRegex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
+                return timeRegex.test(value);
+              },
+              message: (props) =>
+                `${props.value} is not a valid time format (HH:MM)`,
+            },
+          },
+          end_time: {
+            type: String,
+            required: true,
+            validate: {
+              validator: (value) => {
+                const timeRegex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
+                return timeRegex.test(value);
+              },
+              message: (props) =>
+                `${props.value} is not a valid time format (HH:MM)`,
+            },
+          },
+        },
+      ],
+    },
+  ],
+  events: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
+    },
+  ],
 });
 
 const User = model("User", userSchema);

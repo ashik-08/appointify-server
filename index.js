@@ -4,10 +4,13 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const connectDB = require("./src/db/connectDB");
 require("dotenv").config();
+const port = process.env.PORT || 5000;
+
+//All routes
 const userRoutes = require("./src/routes/userRoutes");
 const messageRoutes = require("./src/routes/messageRoutes");
 const ratingsRoutes = require("./src/ratings/ratings");
-const port = process.env.PORT || 5000;
+const eventsRoutes = require("./src/routes/EventRoutes");
 
 // middleware
 app.use(
@@ -51,6 +54,10 @@ app.use("/messages", messageRoutes);
 
 // ratings related routes
 app.use("/ratings", ratingsRoutes);
+
+//events related routes
+app.use('/events',eventsRoutes)
+
 
 app.get("/", (req, res) => {
   res.send("Appointify server is running!");
