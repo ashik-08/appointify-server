@@ -1,15 +1,16 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const connectDB = require("./src/db/connectDB");
-require("dotenv").config();
-const port = process.env.PORT || 5000;
-
-//All routes
 const userRoutes = require("./src/routes/userRoutes");
 const messageRoutes = require("./src/routes/messageRoutes");
-const ratingsRoutes = require("./src/ratings/ratings");
+const blogs = require("./src/routes/blogs");
+const comments = require("./src/routes/comments");
+const likes = require("./src/routes/likes");
+const ratingRoutes = require("./src/routes/ratingRoutes");
+const port = process.env.PORT || 5000;
 const eventsRoutes = require("./src/routes/EventRoutes");
 
 // middleware
@@ -53,12 +54,19 @@ app.use("/users", userRoutes);
 app.use("/messages", messageRoutes);
 
 // ratings related routes
-app.use("/ratings", ratingsRoutes);
+app.use("/ratings", ratingRoutes);
 
-//events related routes
+// blog related routes
+app.use("/blogs", blogs);
+
+// comment related routes
+app.use("/comments", comments);
+
+// like related routes
+app.use("/likes", likes);
+
+// events related routes
 app.use('/events',eventsRoutes)
-
-
 app.get("/", (req, res) => {
   res.send("Appointify server is running!");
 });

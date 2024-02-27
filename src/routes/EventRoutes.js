@@ -4,15 +4,61 @@ const Event = require("../models/Event");
 const User = require("../models/User");
 
 
-router.get('/',async(req,res)=>{
+// GET route to retrieve all events
+router.get('/events', async (req, res) => {
   try {
-    const events = await Event.find()
-    res.send(events)
-  } catch (error) {
-    console.log(error);
-    
+    const events = await Event.find();
+    res.json(events);
+  } catch (err) {
+    console.error("Error retrieving events:", err);
+    res.status(500).json({ error: "Error retrieving events" });
   }
-})
+});
+
+// GET route to retrieve all events for a specific user
+router.get('/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Retrieve all events associated with the user
+    const events = await Event.find({ user: userId });
+    res.json(events);
+  } catch (err) {
+    console.error("Error retrieving events:", err);
+    res.status(500).json({ error: "Error retrieving events" });
+  }
+});
+
+// GET route to retrieve a single event for a specific user
+router.get('/:userId/events/:eventId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const eventId = req.params.eventId;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the event by ID and associated user
+    const event = await Event.findOne({ _id: eventId, user: userId });
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.json(event);
+  } catch (err) {
+    console.error("Error retrieving event:", err);
+    res.status(500).json({ error: "Error retrieving event" });
+  }
+});
 
 
 
@@ -24,7 +70,6 @@ router.post("/:userId", async (req, res) => {
     console.log('events',userId);
       // return
     const eventData = req.body;
-console.log(userId);
     // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
