@@ -116,7 +116,7 @@ router.delete('/removeEvent/:eventId', async (req, res) => {
       return res.status(404).json({ error: "Event not found" });
     }
 
-    res.json({ message: "Event deleted successfully" });
+    res.json({status:true, message: "Event deleted successfully" });
   } catch (err) {
     console.error("Error deleting event:", err);
     res.status(500).json({ error: "Error deleting event" });
