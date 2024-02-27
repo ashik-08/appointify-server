@@ -34,7 +34,6 @@ router.post("/", async (req, res) => {
     const result = await Message.create(newMessage);
     res.status(201).send(result);
   } catch (error) {
-    console.log(error);
     return res.send({ error: true, message: error.message });
   }
 });
@@ -43,7 +42,6 @@ router.post("/", async (req, res) => {
 router.patch("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const messageId = req.params.id;
-    console.log(messageId);
     const result = await Message.updateOne(
       { _id: messageId },
       { $set: { status: "completed" } }
