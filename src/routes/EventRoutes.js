@@ -83,20 +83,15 @@ router.post("/:userId", async (req, res) => {
 });
 
 // PUT route to update one or more fields of a specific event
-router.put("/:userId/:eventId", async (req, res) => {
+router.put("/updateEvent/:eventId", async (req, res) => {
   try {
     const userId = req.params.userId;
     const eventId = req.params.eventId;
     const updateFields = req.body;
 
-    //Find user by ID
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
     //Find event by Id and associated user, and update it's field
     const updatedEvent = await Event.findOneAndUpdate(
-      { _id: eventId, user: userId },
+      { _id: eventId},
       updateFields,
       { new: true } //Return update document
     );
