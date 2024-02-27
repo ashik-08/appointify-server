@@ -114,10 +114,39 @@ router.post("/:userId/:eventId/participants", async (req, res) => {
     event.participants.push(newParticipants);
     await event.save();
 
-    res.json({ success: true, message: 'Participant added successfully' });
+    res.json({ success: true, message: "Participant added successfully" });
   } catch (err) {
     console.error("Error adding participants:", err);
     res.status(500).json({ error: "Error adding participants" });
+  }
+});
+
+// PUT route to update one or more fields of a specific event
+router.put("/:userId/:eventId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const eventId = req.params.eventId;
+    const updateFields = req.body;
+
+    //Find user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+    //Find event by Id and associated user, and update it's field
+    const updatedEvent = await Event.updateOne(
+      { _id: eventId, user: userId },
+      updateFields,
+      { new: true } //Return update document
+    );
+
+    if(!updatedEvent){
+      return res.status(400).json({error:"Event not found"})
+    }
+    res.json(updatedEvent)
+  } catch (err) {
+    console.error("Error updating event:", err);
+    res.status(500).json({ error: "Error updating Event" });
   }
 });
 
