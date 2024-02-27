@@ -3,9 +3,8 @@ const router = express.Router();
 const Event = require("../models/Event");
 const User = require("../models/User");
 
-
 // GET route to retrieve all events
-router.get('/events', async (req, res) => {
+router.get("/events", async (req, res) => {
   try {
     const events = await Event.find();
     res.json(events);
@@ -16,7 +15,7 @@ router.get('/events', async (req, res) => {
 });
 
 // GET route to retrieve all events for a specific user
-router.get('/:userId', async (req, res) => {
+router.get("/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
@@ -36,7 +35,7 @@ router.get('/:userId', async (req, res) => {
 });
 
 // GET route to retrieve a single event for a specific user
-router.get('/:userId/events/:eventId', async (req, res) => {
+router.get("/:userId/:eventId", async (req, res) => {
   try {
     const userId = req.params.userId;
     const eventId = req.params.eventId;
@@ -60,15 +59,12 @@ router.get('/:userId/events/:eventId', async (req, res) => {
   }
 });
 
-
-
 // POST route to create a new event for a specific user
 router.post("/:userId", async (req, res) => {
-
   try {
     const userId = req.params.userId;
-    console.log('events',userId);
-      // return
+    console.log("events", userId);
+    // return
     const eventData = req.body;
     // Find the user by ID
     const user = await User.findById(userId);
@@ -94,7 +90,35 @@ router.post("/:userId", async (req, res) => {
   }
 });
 
+// POST route to add or update participants for a specific event
+
+router.post("/:userId/:eventId/participants", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const eventId = req.params.eventId;
+    const newParticipants = req.body;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the event by ID and associated user
+    const event = await Event.findOne({ _id: eventId, user: userId });
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    // Add new participants to the participants array
+    event.participants.push(newParticipants);
+    await event.save();
+
+    res.json({ success: true, message: 'Participant added successfully' });
+  } catch (err) {
+    console.error("Error adding participants:", err);
+    res.status(500).json({ error: "Error adding participants" });
+  }
+});
+
 module.exports = router;
-
-
-
