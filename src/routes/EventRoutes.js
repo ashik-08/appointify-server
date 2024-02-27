@@ -131,23 +131,69 @@ router.put("/:userId/:eventId", async (req, res) => {
     //Find user by ID
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(400).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
     //Find event by Id and associated user, and update it's field
-    const updatedEvent = await Event.updateOne(
+    const updatedEvent = await Event.findOneAndUpdate(
       { _id: eventId, user: userId },
       updateFields,
       { new: true } //Return update document
     );
 
-    if(!updatedEvent){
-      return res.status(400).json({error:"Event not found"})
+    if (!updatedEvent) {
+      return res.status(404).json({ error: "Event not found" });
     }
-    res.json(updatedEvent)
+    res.json(updatedEvent);
   } catch (err) {
     console.error("Error updating event:", err);
     res.status(500).json({ error: "Error updating Event" });
   }
 });
 
+//PUT route to update specific event participant
+router.put(
+  "/:userId/:eventId/:participantId/updateParticipants",
+  async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const eventId = req.params.eventId;
+      const participantId = req.params.participantId;
+      const updatedParticipantData = req.body;
+
+      // Find the user by ID
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Find the event by ID and associated user
+      const event = await Event.findOne({ _id: eventId, user: userId });
+      if (!event) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+
+      // Find the index of the participant to update in the participants array
+      const participantIndex = event.participants.findIndex(
+        (participant) => participant._id == participantId
+      );
+      if (participantIndex === -1) {
+        return res
+          .status(404)
+          .json({ error: "Participant not found in the event" });
+      }
+
+      // Update the participant with the new data
+      event.participants[participantIndex] = {
+        ...event.participants[participantIndex],
+        ...updatedParticipantData,
+      };
+      await event.save();
+
+      res.json(event);
+    } catch (err) {
+      console.error("Error updating participant:", err);
+      res.status(500).json({ error: "Error updating participant" });
+    }
+  }
+);
 module.exports = router;
