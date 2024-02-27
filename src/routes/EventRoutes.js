@@ -187,17 +187,39 @@ router.put("/:eventId/participants/:participantId", async (req, res) => {
 });
 
 // DELETE route to remove a participant from all events by their ID
-router.delete('/removeParticipants/:participantId', async (req, res) => {
+router.delete('/removeParticipant/:participantId', async (req, res) => {
   try {
     const participantId = req.params.participantId;
 
     // Update all events where the participant exists to remove them from the participants array
     await Event.updateMany({ "participants._id": participantId }, { $pull: { participants: { _id: participantId } } });
 
-    res.json({ message: "Participant removed from all events" });
+    res.json({status: true, message: "Participant removed from all events" });
   } catch (err) {
     console.error("Error deleting participant from events:", err);
     res.status(500).json({ error: "Error deleting participant from events" });
+  }
+});
+
+// DELETE route to remove all participants from a specific event
+router.delete('/removeAllParticipants/:eventId', async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+
+    // Find the event by ID
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    // Clear the participants array for the event
+    event.participants = [];
+    await event.save();
+
+    res.json({ status:true, message: "All participants removed from the event" });
+  } catch (err) {
+    console.error("Error deleting participants from the event:", err);
+    res.status(500).json({ error: "Error deleting participants from the event" });
   }
 });
 
