@@ -53,12 +53,7 @@ const userSchema = new Schema({
       ],
     },
   ],
-  events: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Event",
-    },
-  ],
+
 });
 
 const User = model("User", userSchema);
