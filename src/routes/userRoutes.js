@@ -10,7 +10,6 @@ router.get("/", verifyToken, verifyAdmin, async (req, res) => {
     const result = await User.find();
     res.send(result);
   } catch (error) {
-    console.error(error);
     return res.send({ error: true, message: error.message });
   }
 });
@@ -30,7 +29,6 @@ router.get("/admin/:email", async (req, res) => {
       res.send(true);
     }
   } catch (error) {
-    console.error(error);
     return res.send({ error: true, message: error.message });
   }
 });
@@ -42,7 +40,6 @@ router.get("/:email", verifyToken, async (req, res) => {
     const result = await User.findOne({ email });
     res.send(result);
   } catch (error) {
-    console.error(error);
     return res.send({ error: true, message: error.message });
   }
 });
@@ -61,7 +58,6 @@ router.post("/", async (req, res) => {
     const result = await User.create(user);
     res.status(201).send(result);
   } catch (error) {
-    console.log(error);
     return res.send({ error: true, message: error.message });
   }
 });
@@ -79,8 +75,21 @@ router.put("/:email", verifyToken, async (req, res) => {
     const result = await User.updateOne(query, updatedUser);
     res.send(result);
   } catch (error) {
-    console.log(error);
     return res.send({ error: true, message: error.message });
+  }
+});
+
+// update a user role to admin
+router.patch("/:id", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const result = await User.updateOne(
+      { _id: userId },
+      { $set: { role: "admin" } }
+    );
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
   }
 });
 
