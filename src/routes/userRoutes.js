@@ -11,13 +11,13 @@ router.get("/",verifyToken,verifyAdmin, async (req, res) => {
     const limit = 10;
     const skip = (currentPage - 1) * limit;
     const result = await User.find().skip(skip).limit(limit);
-    res.status(200).send(result);
+    res.send(result);
   } catch (error) {
-    res.status(500).send({ error: true, message: error.message });
+    return res.send({ error: true, message: error.message });
   }
 });
 
-// get all message count
+// get all users count
 router.get("/count", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const result = await User.countDocuments();
@@ -35,14 +35,14 @@ router.get("/admin/:email", async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      res.status(404).send({ message: "User not found" });
+      return res.status(404).send({ message: "User not found" });
     }
 
     if (user.role === "admin") {
       res.send(true);
     }
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    return res.send({ error: true, message: error.message });
   }
 });
 
@@ -51,9 +51,9 @@ router.get("/:email", verifyToken, async (req, res) => {
   try {
     const email = req.params.email;
     const result = await User.findOne({ email });
-    res.status(200).send(result);
+    res.send(result);
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    return res.send({ error: true, message: error.message });
   }
 });
 
@@ -66,12 +66,12 @@ router.post("/", async (req, res) => {
     // check if there already exist an user
     const isExist = await User.findOne(query);
     if (isExist) {
-      res.send({ message: "Already exists" });
+      return res.send({ message: "Already exists" });
     }
     const result = await User.create(user);
-    res.status(200).send(result);
+    res.status(201).send(result);
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    return res.send({ error: true, message: error.message });
   }
 });
 
@@ -86,9 +86,9 @@ router.put("/:email", verifyToken, async (req, res) => {
       },
     };
     const result = await User.updateOne(query, updatedUser);
-    res.status(200).send(result);
+    res.send(result);
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    return res.send({ error: true, message: error.message });
   }
 });
 
