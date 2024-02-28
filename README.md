@@ -7,6 +7,95 @@ ACCESS_TOKEN_SECRET='64-bit_token' <br>
 
 
 
+**User API Documentation**
+
+**Base URL:** http://your-api-base-url/users
+
+**Authentication:** (Specify the authentication method required, if any)
+
+**Available Endpoints:**
+
+**1. Get All Users:**
+
+   * **GET /users**
+   * **Requires Permission:** Admin
+   * **Returns:** An array of all users in the system
+
+**2. Check User Admin Access:**
+
+   * **GET /users/admin/:email**
+   * **Parameters:**
+     - `email`: The email address of the user to check
+   * **Returns:**
+     - `true` if the user has admin rights, `false` otherwise
+
+**3. Get User Data:**
+
+   * **GET /users/:email**
+   * **Requires Permission:** User must be logged in and the requested email must match their own
+   * **Parameters:**
+     - `email`: The email address of the user
+   * **Returns:** The user data for the specified email address
+
+**4. Add a User:**
+
+   * **POST /users**
+   * **Body:** JSON object containing new user data (e.g., name, email, password)
+   * **Returns:** The newly created user object
+
+**5. Update User Profile:**
+
+   * **PUT /users/:email**
+   * **Requires Permission:** User must be logged in and the requested email must match their own
+   * **Parameters:**
+     - `email`: The email address of the user to update
+   * **Body:** JSON object containing updated user data (e.g., name, photo)
+   * **Returns:** The updated user object
+
+**6. Get User Availability:**
+
+   * **GET /users/availability/:userId**
+   * **Parameters:**
+     - `userId`: The ID of the user whose availability you want to retrieve
+   * **Returns:** The availability data for the specified user
+
+**7. Add Availability to User:**
+
+   * **POST /users/availability/:userEmail**
+   * **Requires Permission:** User must be logged in and the `userEmail` must match their own
+   * **Parameters:**
+     - `userEmail`: The email address of the user
+   * **Body:** JSON object containing availability data (e.g., day, slots)
+   * **Returns:** The updated user object with the added availability
+
+**8. Update Slots for a Specific Day:**
+
+   * **PUT /users/availability/:userEmail/slots/:slotId**
+   * **Requires Permission:** User must be logged in and the `userEmail` must match their own
+   * **Parameters:**
+     - `userEmail`: The email address of the user
+     - `slotId`: The ID of the slot to update
+   * **Body:** JSON object containing updated slot data (e.g., start_time, end_time)
+   * **Returns:** The updated user object with the modified availability
+
+**9. Remove a Slot from User's Availability:**
+
+   * **DELETE /users/removeSlot/:userEmail/slots/:slotId**
+   * **Requires Permission:** User must be logged in and the `userEmail` must match their own
+   * **Parameters:**
+     - `userEmail`: The email address of the user
+     - `slotId`: The ID of the slot to remove
+   * **Returns:** The updated user object with the removed slot
+
+**10. Remove a Specific Availability Object from User:**
+
+   * **DELETE /users/removeDay/:userEmail/day/:dayId**
+   * **Requires Permission:** User must be logged in and the `userEmail` must match their own
+   * **Parameters:**
+     - `userEmail`: The email address of the user
+     - `dayId`: The ID of the availability object to remove
+   * **Returns:** The updated user object with the removed availability object
+
 
 
  **API Documentation for Events API**
