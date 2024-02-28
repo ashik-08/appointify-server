@@ -188,15 +188,49 @@ router.put("/availability/:userEmail/slots/:slotId", async (req, res) => {
 });
 
 //  Remove a slot from a user's availability
-router.delete('/availability/:userEmail/slots/:slotId', async (req, res) => {
+//http://localhost:5000/users/removeSlot/forhadairdrop@gmail.com/slots/65df04bf336126e3277c982b
+ 
+router.delete("/removeSlot/:userEmail/slots/:slotId",
+   async (req, res) => {
+     try {
+       const userEmail = req.params.userEmail;
+       const slotId = req.params.slotId;
+
+       // Remove the slot using Mongoose findByIdAndUpdate with $pull operator
+       const user = await User.findOneAndUpdate(
+         { email: userEmail },
+         {
+           $pull: {
+             "availability.$[].slots": { _id: slotId },
+           },
+         },
+         { new: true }
+       );
+
+       if (!user) {
+         return res.status(404).json({ error: "User not found" });
+       }
+
+       res.status(200).json({ message: "Slot removed successfully", user });
+     } catch (error) {
+       console.error(error);
+       res.status(500).json({ error: "Internal Server Error" });
+     }
+   }
+ );
+
+
+ // remove a specific availability object from a user's availability
+//  http://localhost:5000/users/removeDay/forhadairdrop@gmail.com/day/65debedc293382e58827c4f8
+router.delete('/removeDay/:userEmail/day/:dayId', async (req, res) => {
   try {
     const userEmail = req.params.userEmail;
-    const slotId = req.params.slotId;
+    const dayId = req.params.dayId;
 
-    // Remove the slot using Mongoose findByIdAndUpdate with $pull operator
+    // Remove the availability object using Mongoose findOneAndUpdate with $pull operator
     const user = await User.findOneAndUpdate({email:userEmail}, {
       $pull: { 
-        'availability.$[].slots': { _id: slotId } 
+        availability: { _id: dayId } 
       }
     }, { new: true });
 
@@ -204,7 +238,7 @@ router.delete('/availability/:userEmail/slots/:slotId', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.status(200).json({ message: 'Slot removed successfully', user });
+    res.status(200).json({ message: 'Availability object removed successfully', user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
