@@ -84,4 +84,65 @@ router.put("/:email", verifyToken, async (req, res) => {
   }
 });
 
+
+
+// <===========================>Availability api<========================================>
+// Route for getting user availability
+router.get("/availability/:userId", async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // Find the user by ID
+    const user = await User.findOne({email:userId});
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // If user is found, return their availability
+    res.json(user.availability);
+  } catch (error) {
+    console.error("Error fetching user availability:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Route for adding availability to a user
+router.post("/availability/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  const { day, slots } = req.body;
+  console.log(userId);
+// return
+  try {
+    // Find the user by ID
+    const user = await User.findOne({email:userId});
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the user already has availability for the specified day
+    const existingAvailabilityIndex = user.availability.findIndex(
+      (item) => item.day === day
+    );
+
+    if (existingAvailabilityIndex !== -1) {
+      // If availability for the day already exists, append new slots
+      user.availability[existingAvailabilityIndex].slots.push(...slots);
+    } else {
+      // If availability for the day doesn't exist, create a new entry
+      user.availability.push({ day, slots });
+    }
+
+    // Save the updated user document
+    await user.save();
+
+    // Return the updated availability
+    res.json(user.availability);
+  } catch (error) {
+    console.error("Error adding availability:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 module.exports = router;

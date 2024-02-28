@@ -21,7 +21,7 @@ const userSchema = new Schema({
       day: {
         type: String,
         required: true,
-        enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], // Add other days as needed
+        enum: ["Saturday","Sunday","Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       },
       slots: [
         {
