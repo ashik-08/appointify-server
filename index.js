@@ -67,6 +67,8 @@ app.use("/likes", likes);
 
 // events related routes
 app.use('/events',eventsRoutes)
+
+
 app.get("/", (req, res) => {
   res.send("Appointify server is running!");
 });
