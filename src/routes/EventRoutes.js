@@ -20,7 +20,7 @@ router.get("/:userId", async (req, res) => {
     const userId = req.params.userId;
 
     // Find the user by ID
-    const user = await User.findById(userId);
+    const user = await User.findOne({email:userId});
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -55,14 +55,14 @@ router.get("/singleEvent/:eventId", async (req, res) => {
 router.post("/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
-    console.log("events", userId);
-    // return
     const eventData = req.body;
     // Find the user by ID
-    const user = await User.findById(userId);
+    const user = await User.findOne({email:userId});
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    // console.log("events", eventData);
+    // return
 
     // Add user ID to eventData
     eventData.user = userId;
@@ -72,8 +72,8 @@ router.post("/:userId", async (req, res) => {
     await newEvent.save();
 
     // Add the event to the user's events array
-    user.events.push(newEvent);
-    await user.save();
+    // user.events.push(newEvent);
+    // await user.save();
 
     res.status(201).json(newEvent);
   } catch (err) {
@@ -169,38 +169,35 @@ router.post("/addParticipants/:eventId", async (req, res) => {
 });
 
 // PUT route to update a specific participant in the participants array for a specific event
-router.put("/:eventId/participants/:participantId", async (req, res) => {
-  try {
-    const eventId = req.params.eventId;
-    const participantId = req.params.participantId;
-    const updatedParticipantData = req.body;
+router.put(
+  "/updateParticipants/:eventId/:participantId",
+  async (req, res) => {
+    try {
+      const eventId = req.params.eventId;
+      const participantId = req.params.participantId;
+      const updatedParticipantData = req.body;
 
-    // Find the event by ID
-    const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ error: "Event not found" });
+      // Find the event by ID
+      const event = await Event.findOneAndUpdate(
+        { _id: eventId, "participants._id": participantId },
+        { $set: { "participants.$": updatedParticipantData } },
+        { new: true }
+      );
+      if (!event) {
+        return res
+          .status(404)
+          .json({ message: "Event or participant not found" });
+      }
+
+      res
+        .status(200)
+        .json({ message: "Participant updated successfully", event });
+    } catch (err) {
+      console.error("Error updating participant:", err);
+      res.status(500).json({ error: "Error updating participant" });
     }
-
-    // Find the participant by ID in the participants array
-    const participant = event.participants.find(
-      (participant) => participant._id == participantId
-    );
-    if (!participant) {
-      return res.status(404).json({ error: "Participant not found" });
-    }
-
-    // Update the participant's information
-    Object.assign(participant, updatedParticipantData);
-
-    // Save the updated event
-    await event.save();
-
-    res.json(event);
-  } catch (err) {
-    console.error("Error updating participant:", err);
-    res.status(500).json({ error: "Error updating participant" });
   }
-});
+);
 
 // DELETE route to remove a participant from all events by their ID
 router.delete('/removeParticipant/:participantId', async (req, res) => {

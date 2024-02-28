@@ -88,7 +88,7 @@ ACCESS_TOKEN_SECRET='64-bit_token' <br>
 
 **9. Update a Participant in an Event:**
 
-   * **PUT /events/:eventId/participants/:participantId**
+   * **PUT /events/updateParticipants/:eventId/:participantId**
    * **Parameters:**
      - **eventId:** The ID of the event containing the participant
      - **participantId:** The ID of the participant to update

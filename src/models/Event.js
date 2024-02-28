@@ -20,7 +20,8 @@ const eventSchema = new Schema({
   scheduled_time: { type: Date, required: true },
   status: { type: String, required: true },
   user: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
+    require:true,
     ref: "User",
   },
 });
