@@ -177,7 +177,7 @@ router.put(
       const participantId = req.params.participantId;
       const updatedParticipantData = req.body;
 
-      // Find the event by ID
+      // Find the event by ID and the participant by ID within it, and update the participant
       const event = await Event.findOneAndUpdate(
         { _id: eventId, "participants._id": participantId },
         { $set: { "participants.$": updatedParticipantData } },

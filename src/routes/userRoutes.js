@@ -108,19 +108,17 @@ router.get("/availability/:userId", async (req, res) => {
 });
 
 // Route for adding availability to a user
-router.post("/availability/:userId", async (req, res) => {
-  const userId = req.params.userId;
+// sent body data like this formate {"day": "Sunday","slots": [{"start_time": "07:00", "end_time": "11:00"}]}
+router.post("/availability/:userEmail", async (req, res) => {
+  const userEmail = req.params.userEmail;
   const { day, slots } = req.body;
-  console.log(userId);
-// return
   try {
     // Find the user by ID
-    const user = await User.findOne({email:userId});
+    const user = await User.findOne({email:userEmail});
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
     // Check if the user already has availability for the specified day
     const existingAvailabilityIndex = user.availability.findIndex(
       (item) => item.day === day
@@ -142,6 +140,74 @@ router.post("/availability/:userId", async (req, res) => {
   } catch (error) {
     console.error("Error adding availability:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Route for updating slots for a specific day in user's availability
+// pass body object like this {"start_time": "06:00", "end_time": "11:00"}
+router.put("/availability/:userEmail/slots/:slotId", async (req, res) => {
+  try {
+    const userEmail = req.params.userEmail;
+    const slotId = req.params.slotId;
+    const { start_time, end_time } = req.body; // the request body contains the updated start_time and end_time
+    // Find the user by ID
+    const user = await User.findOne({ email: userEmail });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the slot by ID within the user's availability
+    const slotToUpdate = user.availability.reduce((foundSlot, day) => {
+      const slot = day.slots.find((slot) => slot._id == slotId);
+      return slot ? slot : foundSlot;
+    }, null);
+
+    if (!slotToUpdate) {
+      return res.status(404).json({ message: "Slot not found" });
+    }
+
+    // Update the start_time and end_time of the slot
+    if (start_time !== undefined) {
+      slotToUpdate.start_time = start_time;
+    }
+    if (end_time !== undefined) {
+      slotToUpdate.end_time = end_time;
+    }
+
+    // Save the updated user
+    await user.save();
+
+    res
+      .status(200)
+      .json({ status: true, message: "Slot updated successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+//  Remove a slot from a user's availability
+router.delete('/availability/:userEmail/slots/:slotId', async (req, res) => {
+  try {
+    const userEmail = req.params.userEmail;
+    const slotId = req.params.slotId;
+
+    // Remove the slot using Mongoose findByIdAndUpdate with $pull operator
+    const user = await User.findOneAndUpdate({email:userEmail}, {
+      $pull: { 
+        'availability.$[].slots': { _id: slotId } 
+      }
+    }, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Slot removed successfully', user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
