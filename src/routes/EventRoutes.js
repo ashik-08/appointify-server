@@ -1,3 +1,6 @@
+//test
+
+
 const express = require("express");
 const router = express.Router();
 const Event = require("../models/Event");
@@ -19,7 +22,7 @@ router.get("/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    // Find the user by ID
+    // Find the user by Id
     const user = await User.findOne({email:userId});
     if (!user) {
       return res.status(404).json({ error: "User not found" });
