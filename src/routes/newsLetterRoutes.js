@@ -24,10 +24,20 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         const newsLetterData = new newsLetter(req.body);
+        const {email} = newsLetterData;
+        const  isEmailExist = await newsLetter.findOne({email});
+
+        if(isEmailExist){
+            return res.status(200).json({
+                isExist:true,
+                message: "User Data already exist"
+            })
+        }
+
         await newsLetterData.save();
         res.status(200).json({
-            message: "User Data saved successfully",
-            success:true
+            isExist:false,
+            message: "User Data saved successfully"
         });
     } catch (err) {
         console.error(err);

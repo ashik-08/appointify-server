@@ -5,8 +5,6 @@ const newsLetterSchema = new mongose.Schema({
         type: String,
         required: true,
     },
-    photoURL: String,
-    displayName: String,
     registrationTime:{
         type: Date,
         default: Date.now,
