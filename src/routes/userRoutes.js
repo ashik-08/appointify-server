@@ -76,17 +76,24 @@ router.post("/", async (req, res) => {
 });
 
 // update a user profile
-router.put("/:email", verifyToken, async (req, res) => {
+router.put("/updateProfile/:email", async (req, res) => {
   try {
-    const query = { email: req.params.email };
+    const userData = req.body;
+    const filter = { email: req.params.email };
+    const options = { upsert: true };
     const updatedUser = {
       $set: {
-        name: req.body.name,
-        photo: req.body.photo,
+        name: userData?.userName,
+        photo: userData?.userPhoto,
+        bio: userData?.userMessage,
+        dateFormat: userData?.userDateFormat,
+        timeFormat: userData?.userTimeFormat,
+        country: userData?.countryName,
+        language: userData?.userLanguage,
       },
     };
-    const result = await User.updateOne(query, updatedUser);
-    res.send(result);
+    const result = await User.updateOne(filter, updatedUser, options);
+    res.status(200).send(result);
   } catch (error) {
     return res.send({ error: true, message: error.message });
   }

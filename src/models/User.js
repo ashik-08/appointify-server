@@ -16,6 +16,14 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  bio: String,
+  language: {
+    type: String,
+    default: "english"
+  },
+  dateFormat: String,
+  timeFormat: String,
+  country: String,
 });
 
 const User = model("User", userSchema);
