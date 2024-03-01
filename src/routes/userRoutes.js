@@ -5,10 +5,10 @@ const verifyToken = require("../middlewares/verifyToken");
 const verifyAdmin = require("../middlewares/verifyAdmin");
 
 // get all users
-router.get("/",verifyToken,verifyAdmin, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const currentPage = req.query.active;
-    const limit = 10;
+    const limit = 100;
     const skip = (currentPage - 1) * limit;
     const result = await User.find().skip(skip).limit(limit);
     res.send(result);

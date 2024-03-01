@@ -82,6 +82,7 @@ router.post("/:userId", async (req, res) => {
   }
 });
 
+
 // PUT route to update one or more fields of a specific event
 router.put("/updateEvent/:eventId", async (req, res) => {
   try {;
@@ -235,5 +236,8 @@ router.delete('/removeAllParticipants/:eventId', async (req, res) => {
     res.status(500).json({ error: "Error deleting participants from the event" });
   }
 });
+
+
+
 
 module.exports = router;
