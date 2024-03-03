@@ -7,6 +7,7 @@ const eventSchema = new Schema({
     default: () => new mongoose.Types.ObjectId(),
   },
   type: { type: String, required: true },
+  description: { type: String, required: true },
   duration: { type: Number, required: true },
   buffer_time: { type: Number, required: true },
   location: { type: String, required: true },

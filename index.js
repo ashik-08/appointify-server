@@ -13,6 +13,7 @@ const ratingRoutes = require("./src/routes/ratingRoutes");
 const newsLetterRoutes = require("./src/routes/newsLetterRoutes");
 const port = process.env.PORT || 5000;
 const eventsRoutes = require("./src/routes/EventRoutes");
+const googleRoutes = require('./src/routes/GoogleRoutes')
 
 // middleware
 app.use(
@@ -71,6 +72,9 @@ app.use("/events", eventsRoutes);
 
 //newsletter related routes
 app.use("/newsletters", newsLetterRoutes);
+
+// google calender api routes
+app.use('/',googleRoutes)
 
 app.get("/", (req, res) => {
   res.send("Appointify server is running!");

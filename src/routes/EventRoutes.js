@@ -150,11 +150,15 @@ router.get("/participants/:eventId", async (req, res) => {
 });
 // POST route to add or update participants for a specific event
 router.post("/addParticipants/:eventId", async (req, res) => {
+  
+
+
+  
   try {
-    const userId = req.params.userId;
     const eventId = req.params.eventId;
     const newParticipants = req.body;
-
+    console.log(newParticipants);
+// return
     // Find the event by ID and associated user
     const event = await Event.findOne({ _id: eventId });
     if (!event) {
