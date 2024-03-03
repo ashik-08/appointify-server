@@ -12,7 +12,6 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.REDIRECT_URL
 );
 
-console.log(dayjs(new Date()).add(1, "day").toISOString());
 
 const calendar = google.calendar({
   version: "v3",
@@ -54,7 +53,7 @@ router.get("/google/redirect", async (req, res) => {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
     // res.send({ status: true, message: "You have successfully logged in" });
-    res.redirect("http://localhost:5173/bookingConfirm");
+    res.redirect("http://localhost:5173/bookingFrom");
   } catch (error) {
     console.error("Error retrieving access tokens:", error);
     res.status(500).send({ message: "Error during Google authorization" });
@@ -68,16 +67,25 @@ router.get("/google/redirect", async (req, res) => {
  */
 router.post("/schedule_event", async (req, res) => {
   try {
+    const {
+      description,
+      location,
+      duration,
+      title,
+      scheduled_time,
+      participant,
+    } = req.body;
     const event = {
-      summary: "Meeting with shakil vai",
-      location: "dhaka/bangladesh",
+      summary: title,
+      location: location,
       description: "whats on your mind",
       start: {
-        dateTime: dayjs(new Date()).add(1, "day").toISOString(),
+        dateTime: dayjs(scheduled_time),
         timeZone: "Asia/Dhaka",
       },
+
       end: {
-        dateTime: dayjs(new Date()).add(1, "day").add(3, "hour").toISOString(),
+        dateTime: dayjs(scheduled_time).add(duration, "minute").format(),
         timeZone: "Asia/Dhaka",
       },
       conferenceData: {
@@ -85,15 +93,17 @@ router.post("/schedule_event", async (req, res) => {
           requestId: uuid(),
         },
       },
+      attendees: participant
     };
 
-    await calendar.events.insert({
-      calendarId: "primary",
-      requestBody: event,
-      conferenceDataVersion: 1,
-    });
+const response = await calendar.events.insert({
+  calendarId: "primary",
+  requestBody: event,
+  conferenceDataVersion: 1,
+});
+const meetLink = response.data.hangoutLink;
 
-    res.send({ message: "Event created successfully" });
+    res.send({ message: "Event created successfully" ,meetLink});
   } catch (error) {
     console.error("Error creating event:", error);
     res.status(500).send({ message: "Error creating event" });
