@@ -73,6 +73,68 @@ router.get("/eventAvailability/:eventId", async (req, res) => {
     res.status(500).json({ error: "Error retrieving event availability" });
   }
 });
+router.get("/eventAvailability/:eventId/:day", async (req, res) => {
+
+  try {
+    const eventId = req.params.eventId;
+    const requestedDay = req.params.day;
+
+    // Validate the requested day
+    const validDays = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    if (!validDays.includes(requestedDay)) {
+      return res.status(400).json({ error: "Invalid day" });
+    }
+
+    const event = await Event.findOne(
+      { _id: eventId, availability: { $elemMatch: { day: requestedDay } } },
+      { "availability.$": 1 }
+    );
+
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+console.log(event);
+    res.status(200).json( event.availability[0].slots );
+  } catch (error) {
+    console.error(
+      "Error retrieving event availability for specified day:",
+      error
+    );
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+router.get("/dayAvailability/:eventId/allDays", async (req, res) => {
+try {
+  const eventId = req.params.eventId;
+
+  // Find the event by ID
+  const event = await Event.findById(eventId);
+
+  if (!event) {
+    return res.status(404).json({ error: "Event not found" });
+  }
+
+  // Extract day names from the event's availability data
+  const dayNames = event.availability.map((avail) => avail.day);
+
+  res.status(200).json({ dayNames });
+} catch (error) {
+  console.error("Error retrieving day names for event:", error);
+  res.status(500).json({ error: "Internal server error" });
+}
+});
+
+
 
 // POST route to create a new event for a specific user
 router.post("/:userId", async (req, res) => {
