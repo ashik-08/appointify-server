@@ -54,6 +54,26 @@ router.get("/singleEvent/:eventId", async (req, res) => {
   }
 });
 
+
+
+// Get route to specific event availability
+
+router.get("/eventAvailability/:eventId", async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+    const event = await Event.findOne({ _id: eventId }, { availability: 1 });
+
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.status(200).json({ availability: event.availability });
+  } catch (err) {
+    console.error("Error retrieving event availability:", err);
+    res.status(500).json({ error: "Error retrieving event availability" });
+  }
+});
+
 // POST route to create a new event for a specific user
 router.post("/:userId", async (req, res) => {
   try {

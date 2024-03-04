@@ -8,7 +8,7 @@ const eventSchema = new Schema({
   },
   type: { type: String, required: true },
   description: { type: String, required: true },
-  duration: { type: Number, required: true },
+  duration: { type: String, required: true },
   buffer_time: { type: Number, required: true },
   location: { type: String, required: true },
   platform: { type: String, required: true },
@@ -47,26 +47,26 @@ const eventSchema = new Schema({
           start_time: {
             type: String,
             required: true,
-            // validate: {
-            //   validator: (value) => {
-            //     const timeRegex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
-            //     return timeRegex.test(value);
-            //   },
-            //   message: (props) =>
-            //     `${props.value} is not a valid time format (HH:MM)`,
-            // },
+            validate: {
+              validator: (value) => {
+                const timeRegex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
+                return timeRegex.test(value);
+              },
+              message: (props) =>
+                `${props.value} is not a valid time format (HH:MM)`,
+            },
           },
           end_time: {
             type: String,
             required: true,
-            // validate: {
-            //   validator: (value) => {
-            //     const timeRegex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
-            //     return timeRegex.test(value);
-            //   },
-            //   message: (props) =>
-            //     `${props.value} is not a valid time format (HH:MM)`,
-            // },
+            validate: {
+              validator: (value) => {
+                const timeRegex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
+                return timeRegex.test(value);
+              },
+              message: (props) =>
+                `${props.value} is not a valid time format (HH:MM)`,
+            },
           },
         },
       ],
