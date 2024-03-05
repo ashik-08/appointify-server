@@ -17,6 +17,29 @@ router.get("/", async (req, res) => {
   }
 });
 
+// All search matched events specific to the user
+router.get("/:userEmail/:searchQuery", async (req, res) => {
+  const { userEmail, searchQuery } = req.params;
+
+  try {
+    // Construct a Mongoose query to filter events based on search criteria
+    const events = await Event.find({
+      user: userEmail,
+      type: { $regex: new RegExp(searchQuery, "i") }, // Case-insensitive search
+    });
+
+    res.json(events);
+  } catch (err) {
+    console.error("Error retrieving events:", err);
+    res.status(500).json({ error: "Error retrieving events" });
+  }
+});
+
+
+
+
+
+
 // GET route to retrieve all events for a specific user
 router.get("/:userId", async (req, res) => {
   try {
@@ -243,6 +266,7 @@ router.delete('/removeAllParticipants/:eventId', async (req, res) => {
     res.status(500).json({ error: "Error deleting participants from the event" });
   }
 });
+
 
 
 
