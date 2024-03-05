@@ -97,17 +97,15 @@ router.get("/eventAvailability/:eventId/:day", async (req, res) => {
     );
     //find event duration
     const { duration } = await Event.findById(eventId, { _id: 0, duration: 1 });
-
+    const eventDuration = duration;
     if (!event && !duration) {
       return res.status(404).json({ error: "Event not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        eventSpecificDaySlots: event.availability[0].slots,
-        eventDuration,
-      });
+    res.status(200).json({
+      eventSpecificDaySlots: event.availability[0].slots,
+      eventDuration,
+    });
   } catch (error) {
     console.error(
       "Error retrieving event availability for specified day:",
