@@ -1,6 +1,5 @@
 //test
 
-
 const express = require("express");
 const router = express.Router();
 const Event = require("../models/Event");
@@ -23,7 +22,7 @@ router.get("/:userId", async (req, res) => {
     const userId = req.params.userId;
 
     // Find the user by Id
-    const user = await User.findOne({email:userId});
+    const user = await User.findOne({ email: userId });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -54,9 +53,7 @@ router.get("/singleEvent/:eventId", async (req, res) => {
   }
 });
 
-
-
-// Get route to specific event availability
+// Get route to specific event availability all time
 
 router.get("/eventAvailability/:eventId", async (req, res) => {
   try {
@@ -73,8 +70,8 @@ router.get("/eventAvailability/:eventId", async (req, res) => {
     res.status(500).json({ error: "Error retrieving event availability" });
   }
 });
+//Get event available time slots by specific day name
 router.get("/eventAvailability/:eventId/:day", async (req, res) => {
-
   try {
     const eventId = req.params.eventId;
     const requestedDay = req.params.day;
@@ -93,16 +90,24 @@ router.get("/eventAvailability/:eventId/:day", async (req, res) => {
       return res.status(400).json({ error: "Invalid day" });
     }
 
+    //find event available time slots
     const event = await Event.findOne(
       { _id: eventId, availability: { $elemMatch: { day: requestedDay } } },
       { "availability.$": 1 }
     );
+    //find event duration
+    const { duration } = await Event.findById(eventId, { _id: 0, duration: 1 });
 
-    if (!event) {
+    if (!event && !duration) {
       return res.status(404).json({ error: "Event not found" });
     }
-console.log(event);
-    res.status(200).json( event.availability[0].slots );
+
+    res
+      .status(200)
+      .json({
+        eventSpecificDaySlots: event.availability[0].slots,
+        eventDuration,
+      });
   } catch (error) {
     console.error(
       "Error retrieving event availability for specified day:",
@@ -112,29 +117,27 @@ console.log(event);
   }
 });
 
-
+//Get all event days name as array
 router.get("/dayAvailability/:eventId/allDays", async (req, res) => {
-try {
-  const eventId = req.params.eventId;
+  try {
+    const eventId = req.params.eventId;
 
-  // Find the event by ID
-  const event = await Event.findById(eventId);
+    // Find the event by ID
+    const event = await Event.findById(eventId);
 
-  if (!event) {
-    return res.status(404).json({ error: "Event not found" });
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    // Extract day names from the event's availability data
+    const dayNames = event.availability.map((avail) => avail.day);
+
+    res.status(200).json({ dayNames });
+  } catch (error) {
+    console.error("Error retrieving day names for event:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  // Extract day names from the event's availability data
-  const dayNames = event.availability.map((avail) => avail.day);
-
-  res.status(200).json({ dayNames });
-} catch (error) {
-  console.error("Error retrieving day names for event:", error);
-  res.status(500).json({ error: "Internal server error" });
-}
 });
-
-
 
 // POST route to create a new event for a specific user
 router.post("/:userId", async (req, res) => {
@@ -142,7 +145,7 @@ router.post("/:userId", async (req, res) => {
     const userId = req.params.userId;
     const eventData = req.body;
     // Find the user by ID
-    const user = await User.findOne({email:userId});
+    const user = await User.findOne({ email: userId });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -167,16 +170,15 @@ router.post("/:userId", async (req, res) => {
   }
 });
 
-
 // PUT route to update one or more fields of a specific event
 router.put("/updateEvent/:eventId", async (req, res) => {
-  try {;
+  try {
     const eventId = req.params.eventId;
     const updateFields = req.body;
 
     //Find event by Id and associated user, and update it's field
     const updatedEvent = await Event.findOneAndUpdate(
-      { _id: eventId},
+      { _id: eventId },
       updateFields,
       { new: true } //Return update document
     );
@@ -192,7 +194,7 @@ router.put("/updateEvent/:eventId", async (req, res) => {
 });
 
 // DELETE route to delete an event by its ID
-router.delete('/removeEvent/:eventId', async (req, res) => {
+router.delete("/removeEvent/:eventId", async (req, res) => {
   try {
     const eventId = req.params.eventId;
 
@@ -202,7 +204,7 @@ router.delete('/removeEvent/:eventId', async (req, res) => {
       return res.status(404).json({ error: "Event not found" });
     }
 
-    res.json({status:true, message: "Event deleted successfully" });
+    res.json({ status: true, message: "Event deleted successfully" });
   } catch (err) {
     console.error("Error deleting event:", err);
     res.status(500).json({ error: "Error deleting event" });
@@ -232,15 +234,11 @@ router.get("/participants/:eventId", async (req, res) => {
 });
 // POST route to add or update participants for a specific event
 router.post("/addParticipants/:eventId", async (req, res) => {
-  
-
-
-  
   try {
     const eventId = req.params.eventId;
     const newParticipants = req.body;
     console.log(newParticipants);
-// return
+    // return
     // Find the event by ID and associated user
     const event = await Event.findOne({ _id: eventId });
     if (!event) {
@@ -259,45 +257,45 @@ router.post("/addParticipants/:eventId", async (req, res) => {
 });
 
 // PUT route to update a specific participant in the participants array for a specific event
-router.put(
-  "/updateParticipants/:eventId/:participantId",
-  async (req, res) => {
-    try {
-      const eventId = req.params.eventId;
-      const participantId = req.params.participantId;
-      const updatedParticipantData = req.body;
+router.put("/updateParticipants/:eventId/:participantId", async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+    const participantId = req.params.participantId;
+    const updatedParticipantData = req.body;
 
-      // Find the event by ID and the participant by ID within it, and update the participant
-      const event = await Event.findOneAndUpdate(
-        { _id: eventId, "participants._id": participantId },
-        { $set: { "participants.$": updatedParticipantData } },
-        { new: true }
-      );
-      if (!event) {
-        return res
-          .status(404)
-          .json({ message: "Event or participant not found" });
-      }
-
-      res
-        .status(200)
-        .json({ message: "Participant updated successfully", event });
-    } catch (err) {
-      console.error("Error updating participant:", err);
-      res.status(500).json({ error: "Error updating participant" });
+    // Find the event by ID and the participant by ID within it, and update the participant
+    const event = await Event.findOneAndUpdate(
+      { _id: eventId, "participants._id": participantId },
+      { $set: { "participants.$": updatedParticipantData } },
+      { new: true }
+    );
+    if (!event) {
+      return res
+        .status(404)
+        .json({ message: "Event or participant not found" });
     }
+
+    res
+      .status(200)
+      .json({ message: "Participant updated successfully", event });
+  } catch (err) {
+    console.error("Error updating participant:", err);
+    res.status(500).json({ error: "Error updating participant" });
   }
-);
+});
 
 // DELETE route to remove a participant from all events by their ID
-router.delete('/removeParticipant/:participantId', async (req, res) => {
+router.delete("/removeParticipant/:participantId", async (req, res) => {
   try {
     const participantId = req.params.participantId;
 
     // Update all events where the participant exists to remove them from the participants array
-    await Event.updateMany({ "participants._id": participantId }, { $pull: { participants: { _id: participantId } } });
+    await Event.updateMany(
+      { "participants._id": participantId },
+      { $pull: { participants: { _id: participantId } } }
+    );
 
-    res.json({status: true, message: "Participant removed from all events" });
+    res.json({ status: true, message: "Participant removed from all events" });
   } catch (err) {
     console.error("Error deleting participant from events:", err);
     res.status(500).json({ error: "Error deleting participant from events" });
@@ -305,7 +303,7 @@ router.delete('/removeParticipant/:participantId', async (req, res) => {
 });
 
 // DELETE route to remove all participants from a specific event
-router.delete('/removeAllParticipants/:eventId', async (req, res) => {
+router.delete("/removeAllParticipants/:eventId", async (req, res) => {
   try {
     const eventId = req.params.eventId;
 
@@ -319,14 +317,16 @@ router.delete('/removeAllParticipants/:eventId', async (req, res) => {
     event.participants = [];
     await event.save();
 
-    res.json({ status:true, message: "All participants removed from the event" });
+    res.json({
+      status: true,
+      message: "All participants removed from the event",
+    });
   } catch (err) {
     console.error("Error deleting participants from the event:", err);
-    res.status(500).json({ error: "Error deleting participants from the event" });
+    res
+      .status(500)
+      .json({ error: "Error deleting participants from the event" });
   }
 });
-
-
-
 
 module.exports = router;
