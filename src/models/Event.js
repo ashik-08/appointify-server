@@ -12,12 +12,13 @@ const eventSchema = new Schema({
   buffer_time: { type: Number, required: true },
   location: { type: String, required: true },
   platform: { type: String, required: true },
+  eventLink: { type: String, required: true },
   participants: [
     {
       name: { type: String, required: true },
       email: { type: String, required: true },
-      image: { type: String, required: true },
-      message: { type: String, required: true },
+      // image: { type: String, required: true },
+      // message: { type: String, required: true },
     },
   ],
   scheduled_time: { type: String, required: false },

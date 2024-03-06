@@ -162,8 +162,6 @@ async function handleCreateEvent(req,res){
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      // console.log("events", eventData);
-      // return
 
       // Add user ID to eventData
       eventData.user = userId;
@@ -184,9 +182,9 @@ async function handleCreateEvent(req,res){
 }
 
 async function handleUpdateEvent(req,res){
-    try {
-      const eventId = req.params.eventId;
-      const updateFields = req.body;
+  try {
+    const eventId = req.params.eventId;
+    const updateFields = req.body;
       //Find event by Id and associated user, and update it's field
       const updatedEvent = await Event.findOneAndUpdate(
         { _id: eventId },
@@ -197,7 +195,6 @@ async function handleUpdateEvent(req,res){
       if (!updatedEvent) {
         return res.status(404).json({ error: "Event not found" });
       }
-      // console.log(updateFields);
       res.json(updatedEvent);
     } catch (err) {
       console.error("Error updating event:", err);
@@ -245,7 +242,6 @@ async function handleAddParticipants(req,res){
     try {
       const eventId = req.params.eventId;
       const newParticipants = req.body;
-      console.log(newParticipants);
       // return
       // Find the event by ID and associated user
       const event = await Event.findOne({ _id: eventId });
