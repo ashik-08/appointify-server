@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const globals = require("node-global-storage");
 const { v4: uuidv4 } = require("uuid");
+const paymentSchema = require("../models/paymentSchema");
 
 const bkash_header = async () => {
   return {
@@ -15,7 +16,8 @@ const bkash_header = async () => {
 
 router.post("/payment/create", async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { amount, email } = req.body;
+    globals.set('email', email);
     const { data } = await axios.post(
       process.env.bkash_create_payment_url,
       {
@@ -59,11 +61,25 @@ router.get("/payment/callback", async (req, res) => {
           headers: await bkash_header(),
         }
       );
-      if (data && data.statusCode === "0000") {
-        console.log("success", data);
-      }
+      //after successful payment
+      if (data && data.statusCode === '0000') {
+        const email = globals.get('email');
+        // await paymentModel.create({
+        //     email,
+        //     paymentID,
+        //     trxID: data.trxID,
+        //     date: data.paymentExecuteTime,
+        //     amount: parseInt(data.amount)
+        // })
+        //store payment info in the database logics here
+
+        return res.redirect(`${process.env.frontend_url}/successpayment`)
+    }else{
+        return res.redirect(`${process.env.frontend_url}/errorpayment?message=${data.statusMessage}`)
+    }
     } catch (error) {
       console.log(error);
+      return res.redirect(`${process.env.frontend_url}/successpayment`)
     }
   }
 });
