@@ -14,7 +14,8 @@ const newsLetterRoutes = require("./src/routes/newsLetterRoutes");
 const bkashRoutes = require("./src/routes/bkashRoutes");
 const port = process.env.PORT || 5000;
 const eventsRoutes = require("./src/routes/EventRoutes");
-const googleRoutes = require('./src/routes/GoogleRoutes')
+const googleRoutes = require('./src/routes/GoogleRoutes');
+const bkashMiddleware = require("./src/middlewares/bkashMiddleware");
 
 // middleware
 app.use(
@@ -78,7 +79,7 @@ app.use("/newsletters", newsLetterRoutes);
 app.use('/',googleRoutes)
 
 // bkash payment api routes
-app.use('/bkash',bkashRoutes);
+app.use('/bkash',bkashMiddleware.bkash_auth, bkashRoutes);
 
 app.get("/", (req, res) => {
   res.send("Appointify server is running!");
