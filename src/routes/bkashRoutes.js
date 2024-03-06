@@ -44,9 +44,27 @@ router.post("/payment/create", async (req, res) => {
 router.get("/payment/callback", async (req, res) => {
   const { paymentID, status } = req.query;
   //   console.log(req.query);
-  
-  if(status==='cancel' || status === 'failure'){
-    return res.redirect(process.env.frontend_url+`/errorpayment?message=${status}`);
+
+  if (status === "cancel" || status === "failure") {
+    return res.redirect(
+      process.env.frontend_url + `/errorpayment?message=${status}`
+    );
+  }
+  if (status === "success") {
+    try {
+      const { data } = await axios.post(
+        process.env.bkash_execute_payment_url,
+        { paymentID },
+        {
+          headers: await bkash_header(),
+        }
+      );
+      if (data && data.statusCode === "0000") {
+        console.log("success", data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 });
 
