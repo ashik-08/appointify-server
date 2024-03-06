@@ -6,6 +6,7 @@ const globals = require("node-global-storage");
 const { v4: uuidv4 } = require("uuid");
 const paymentSchema = require("../models/paymentSchema");
 const payment = new mongoose.model("payment", paymentSchema);
+const User = require("../models/User");
 
 const bkash_header = async () => {
   return {
@@ -18,8 +19,9 @@ const bkash_header = async () => {
 
 router.post("/payment/create", async (req, res) => {
   try {
-    const { amount, email } = req.body;
+    const { amount, email, status } = req.body;
     globals.set("email", email);
+    globals.set("status", status);
     const { data } = await axios.post(
       process.env.bkash_create_payment_url,
       {
@@ -66,15 +68,27 @@ router.get("/payment/callback", async (req, res) => {
       //after successful payment
       if (data && data.statusCode === "0000") {
         const email = globals.get("email");
+        const status = globals.get("status");
         const paymentData = new payment({
           email,
+          status,
           paymentID,
           trxID: data.trxID,
           date: data.paymentExecuteTime,
-          amount: parseInt(data.amount),
+          amount: parseInt(data.amount)
         });
-        console.log(paymentData);
+        // console.log(paymentData);
         await paymentData.save();
+        //update user status
+        const query = { email };
+        const updatedUser = {
+          $set: {
+            status
+          },
+        };
+        const result = await User.updateOne(query, updatedUser);
+        // console.log(result);
+
         return res.redirect(`${process.env.frontend_url}/successpayment`);      
       } else {
         return res.redirect(
