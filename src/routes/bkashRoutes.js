@@ -21,7 +21,7 @@ router.post("/payment/create", async (req, res) => {
       {
         mode: "0011",
         payerReference: " ",
-        callbackURL: process.env.local_server_url,
+        callbackURL: `${process.env.server_url}/bkash/payment/callback`,
         amount: amount,
         currency: "BDT",
         intent: "sale",
@@ -38,6 +38,15 @@ router.post("/payment/create", async (req, res) => {
     res.status(500).json({
       message: "Internal server error",
     });
+  }
+});
+
+router.get("/payment/callback", async (req, res) => {
+  const { paymentID, status } = req.query;
+  //   console.log(req.query);
+  
+  if(status==='cancel' || status === 'failure'){
+    return res.redirect(process.env.frontend_url+`/errorpayment?message=${status}`);
   }
 });
 
