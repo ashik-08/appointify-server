@@ -1,27 +1,47 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const userSchema = new Schema({
-  // Define user schema here
+const eventSchema = new Schema({
   _id: {
     type: Schema.Types.ObjectId,
     default: () => new mongoose.Types.ObjectId(),
   },
-  name: String,
-  photo: String,
-  email: String,
-  status: String,
-  role: String,
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  type: { type: String, required: true },
+  description: { type: String, required: true },
+  duration: { type: String, required: true },
+  buffer_time: { type: Number, required: true },
+  location: { type: String, required: true },
+  platform: { type: String, required: true },
+  eventLink: { type: String, required: true },
+  participants: [
+    {
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+      // image: { type: String, required: true },
+      // message: { type: String, required: true },
+    },
+  ],
+  scheduled_time: { type: String, required: false },
+  status: { type: String, required: true },
+  user: {
+    type: String,
+    require: true,
+    ref: "User",
   },
   availability: [
     {
       day: {
         type: String,
         required: true,
-        enum: ["Saturday","Sunday","Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        enum: [
+          "Saturday",
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+        ],
       },
       slots: [
         {
@@ -55,6 +75,6 @@ const userSchema = new Schema({
   ],
 });
 
-const User = model("User", userSchema);
+const Event = model("Event", eventSchema);
 
-module.exports = User;
+module.exports = Event;
