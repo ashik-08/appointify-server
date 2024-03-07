@@ -106,8 +106,6 @@ router.patch("/:id", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-
-
 // <===========================>Availability api<========================================>
 // Route for getting user availability
 router.get("/availability/:userId", async (req, res) => {
@@ -115,14 +113,15 @@ router.get("/availability/:userId", async (req, res) => {
 
   try {
     // Find the user by ID
-    const user = await User.findOne({email:userId});
+    const user = await User.findOne({ email: userId });
 
+    const daysArr = user.availability.map((item) => item.day);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     // If user is found, return their availability
-    res.json(user.availability);
+    res.json({ availability: user.availability, daysArr });
   } catch (error) {
     console.error("Error fetching user availability:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -136,7 +135,7 @@ router.post("/availability/:userEmail", async (req, res) => {
   const { day, slots } = req.body;
   try {
     // Find the user by ID
-    const user = await User.findOne({email:userEmail});
+    const user = await User.findOne({ email: userEmail });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -211,59 +210,62 @@ router.put("/availability/:userEmail/slots/:slotId", async (req, res) => {
 
 //  Remove a slot from a user's availability
 //http://localhost:5000/users/removeSlot/forhadairdrop@gmail.com/slots/65df04bf336126e3277c982b
- 
-router.delete("/removeSlot/:userEmail/slots/:slotId",
-   async (req, res) => {
-     try {
-       const userEmail = req.params.userEmail;
-       const slotId = req.params.slotId;
 
-       // Remove the slot using Mongoose findByIdAndUpdate with $pull operator
-       const user = await User.findOneAndUpdate(
-         { email: userEmail },
-         {
-           $pull: {
-             "availability.$[].slots": { _id: slotId },
-           },
-         },
-         { new: true }
-       );
+router.delete("/removeSlot/:userEmail/slots/:slotId", async (req, res) => {
+  try {
+    const userEmail = req.params.userEmail;
+    const slotId = req.params.slotId;
 
-       if (!user) {
-         return res.status(404).json({ error: "User not found" });
-       }
+    // Remove the slot using Mongoose findByIdAndUpdate with $pull operator
+    const user = await User.findOneAndUpdate(
+      { email: userEmail },
+      {
+        $pull: {
+          "availability.$[].slots": { _id: slotId },
+        },
+      },
+      { new: true }
+    );
 
-       res.status(200).json({ message: "Slot removed successfully", user });
-     } catch (error) {
-       console.error(error);
-       res.status(500).json({ error: "Internal Server Error" });
-     }
-   }
- );
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
+    res.status(200).json({ message: "Slot removed successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
- // remove a specific availability object from a user's availability
+// remove a specific availability object from a user's availability
 //  http://localhost:5000/users/removeDay/forhadairdrop@gmail.com/day/65debedc293382e58827c4f8
-router.delete('/removeDay/:userEmail/day/:dayId', async (req, res) => {
+router.delete("/removeDay/:userEmail/day/:dayId", async (req, res) => {
   try {
     const userEmail = req.params.userEmail;
     const dayId = req.params.dayId;
 
     // Remove the availability object using Mongoose findOneAndUpdate with $pull operator
-    const user = await User.findOneAndUpdate({email:userEmail}, {
-      $pull: { 
-        availability: { _id: dayId } 
-      }
-    }, { new: true });
+    const user = await User.findOneAndUpdate(
+      { email: userEmail },
+      {
+        $pull: {
+          availability: { _id: dayId },
+        },
+      },
+      { new: true }
+    );
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json({ message: 'Availability object removed successfully', user });
+    res
+      .status(200)
+      .json({ message: "Availability object removed successfully", user });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

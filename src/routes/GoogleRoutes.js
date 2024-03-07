@@ -53,7 +53,7 @@ router.get("/google/redirect", async (req, res) => {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
     // res.send({ status: true, message: "You have successfully logged in" });
-    res.redirect("http://localhost:5173/bookingFrom");
+    res.redirect(process.env.FRONT_REDIRECT_URL);
   } catch (error) {
     console.error("Error retrieving access tokens:", error);
     res.status(500).send({ message: "Error during Google authorization" });

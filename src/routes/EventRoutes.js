@@ -20,7 +20,9 @@ const {
   handleRemoveParticipant,
   handleRemoveAllParticipant,
   handleUpdateSpecificParticipant,
-} = require("../controller/events/Events");
+} = require("../controller/events/events");
+
+
 
 // GET route to retrieve all events
 router.get("/", handleGetAllEvents);
